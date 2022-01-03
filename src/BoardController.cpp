@@ -5,7 +5,7 @@ int** board;
 
 //common.h function, maybe will consider the conten to be moved to a common.cpp file
 bool out_of_bounds(int x, int y) {
-    if (x < 0 || x > SIZE || y < 0 || y > SIZE) return true;
+    if (x < 0 || x > SIZE - 1 || y < 0 || y > SIZE - 1) return true;
     else return false;
 }
 
