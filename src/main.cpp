@@ -4,7 +4,7 @@
 int main() {
     EricReversi Game;
 
-    if (Game.Construct(512, 512, 2, 2))
+    if (Game.Construct(536, 536, 2, 2))
 		Game.Start();
 
 

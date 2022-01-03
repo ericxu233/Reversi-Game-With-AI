@@ -8,6 +8,12 @@
 
 using namespace std;
 
+extern int** board;
 
 
+struct Piece {
+    int x;
+    int y;
+};
 
+bool out_of_bounds(int x, int y);

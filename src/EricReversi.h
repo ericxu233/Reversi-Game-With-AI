@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "BoardController.h"
 
 class EricReversi : public olc::PixelGameEngine {
 public:
@@ -26,6 +27,7 @@ private:
     int slen;
     int midX[8];
     int midY[8];
+    BoardController* b_con;
 
 public:
     //core engine functions
@@ -40,6 +42,8 @@ private:
     //game drawing routine
     void draw_board();
     void draw_piece(int x, int y, int player);
+    void draw_winner();
+    void draw_turn();
 
     //testing only
     void add_piece(int x, int y);
