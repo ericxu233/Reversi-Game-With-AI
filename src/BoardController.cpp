@@ -132,9 +132,11 @@ bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, int player, 
 
 bool BoardController::gppDIR(int x, int y, int deltaX, int deltaY) {
     int iter = 1;
-    while(!out_of_bounds(x + iter*deltaX, y + iter*deltaY)) {
-        int tempx = x + iter*deltaX;
-        int tempy = y + iter* deltaY;
+    int tempx = x;
+    int tempy = y;
+    while(!out_of_bounds(tempx + iter*deltaX, tempy + iter*deltaY)) {
+        tempx = x + iter*deltaX;
+        tempy = y + iter* deltaY;
         if (iter == 1 && boardref[tempx][tempy] == player) return false;
         else if(boardref[tempx][tempy] == 0) return false;
         else if(boardref[tempx][tempy] == player) return true;
