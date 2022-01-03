@@ -86,6 +86,7 @@ int BoardController::get_player() {
 void BoardController::get_playable_pos() {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
+            if (board[i][j] != 0) continue;
             bool playable_ind = gppDIR(i, j, 1, 1) ||
                             gppDIR(i, j, 1, 0) ||
                             gppDIR(i, j, 1, -1) ||
