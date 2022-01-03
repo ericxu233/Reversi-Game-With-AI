@@ -135,8 +135,8 @@ bool BoardController::gppDIR(int x, int y, int deltaX, int deltaY) {
     int tempx = x;
     int tempy = y;
     while(!out_of_bounds(tempx + iter*deltaX, tempy + iter*deltaY)) {
-        tempx = x + iter*deltaX;
-        tempy = y + iter* deltaY;
+        tempx = tempx + iter*deltaX;
+        tempy = tempx + iter* deltaY;
         if (iter == 1 && boardref[tempx][tempy] == player) return false;
         else if(boardref[tempx][tempy] == 0) return false;
         else if(boardref[tempx][tempy] == player) return true;
