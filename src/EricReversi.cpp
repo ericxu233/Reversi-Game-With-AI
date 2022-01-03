@@ -19,16 +19,16 @@ bool EricReversi::OnUserCreate()
         }
     }
     
-    board[3][3] = 1;
-    board[4][3] = 2;
-    board[4][4] = 1;
-    board[3][4] = 2;
+    board[3][3] = 2;
+    board[4][3] = 1;
+    board[4][4] = 2;
+    board[3][4] = 1;
 
     b_con = new BoardController(false, board);
 
     b_con->get_playable_pos();
 
-    cout << "Reach Here?" << endl;
+    //cout << "Reach Here?" << endl;
 
 	return true;
 }
@@ -43,13 +43,15 @@ bool EricReversi::OnUserUpdate(float fElapsedTime)
     //usleep(10000);
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            if (board[i][j] != 0) draw_piece(i, j, b_con->get_player());
+            if (board[i][j] != 0) draw_piece(i, j, board[i][j]);
         }
     }
     
     for (int i = 0; i < b_con->playable.size(); i++) {
         FillCircle(midX[b_con->playable[i].x], midY[b_con->playable[i].y], slen*0.1, olc::RED);
     }
+
+    draw_turn();
 
 	return true;
 }
@@ -108,10 +110,17 @@ void EricReversi::draw_winner() {
     else if (winner == 1) message = "Player 1 has won!";
     else if (winner == 2) message = "Player 2 has won!";
 
-    if (winner == 1 || winner == 3) DrawString(width/2 - message.length()*scale*8/2, 12, message, olc::BLACK, scale);
-    else if (winner == 2) DrawString(width/2 - message.length()*scale*8/2, 12, message, olc::WHITE, scale);
+    if (winner == 1 || winner == 3) DrawString(width/2 - message.length()*scale*8/2, 8, message, olc::BLACK, scale);
+    else if (winner == 2) DrawString(width/2 - message.length()*scale*8/2, 8, message, olc::WHITE, scale);
 }
 
+void EricReversi::draw_turn() {
+    int x = width - padding/2;
+    int y = width- padding/2;
+
+    if (b_con->get_player() == 1) FillCircle(x, y, padding/3, olc::BLACK);
+    else FillCircle(x, y, padding/3, olc::WHITE);
+}
 
 void EricReversi::add_piece(int x, int y) {
     pieceX.push_back(x);

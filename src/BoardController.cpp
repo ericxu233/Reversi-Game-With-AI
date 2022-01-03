@@ -37,14 +37,22 @@ BoardController::BoardController(bool ai1, int** target) {
 }
 
 bool BoardController::player_update(int x, int y) {
+    bool match = false;
+    for (int i = 0; i < playable.size(); i++) {
+        if (x == playable[i].x && y == playable[i].y) match = true;
+    }
+    if (!match) return false;
     if (end) return true;
     playable.clear();
     boardref[x][y] = player;
+    flip(x, y, false, NULL);
     player = (!(player - 1)) + 1;
     num_pieces++;
 
     if (num_pieces == SIZE*SIZE) end = true;
     if (end) return true;
+
+    //cout << "Reaches HEre" << endl;
 
     get_playable_pos();
 
@@ -52,6 +60,7 @@ bool BoardController::player_update(int x, int y) {
         player = (!(player - 1)) + 1;
         get_playable_pos();
         if (playable.empty()) {
+            //cout << "Reaches HEre Uh Oh" << endl;
             end = true;
             return true;
         }
@@ -102,26 +111,30 @@ void BoardController::get_playable_pos() {
     }
 }
 
-void BoardController::flip(int x, int y, int player, bool record, vector<Piece>* flip_ref = NULL) {
+void BoardController::flip(int x, int y, bool record, vector<Piece>* flip_ref = NULL) {
     flipped_content = flip_ref;
 
-    flipDIR(x, y, 1, 1, player, record, 1);
-    flipDIR(x, y, 1, 0, player, record, 1);
-    flipDIR(x, y, 1, -1, player, record, 1);
-    flipDIR(x, y, 0, 1, player, record, 1);
-    flipDIR(x, y, 0, -1, player, record, 1);
-    flipDIR(x, y, -1, 1, player, record, 1);
-    flipDIR(x, y, -1, 0, player, record, 1);
-    flipDIR(x, y, -1, -1, player, record, 1);
+    flipDIR(x, y, 1, 1, record, 1);
+    flipDIR(x, y, 1, 0, record, 1);
+    flipDIR(x, y, 1, -1, record, 1);
+    flipDIR(x, y, 0, 1, record, 1);
+    flipDIR(x, y, 0, -1, record, 1);
+    flipDIR(x, y, -1, 1, record, 1);
+    flipDIR(x, y, -1, 0, record, 1);
+    flipDIR(x, y, -1, -1, record, 1);
 
     flipped_content = NULL;
 }
 
-bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, int player, bool record, int iter) {
+bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, bool record, int iter) {
+    if (iter == 1) {
+        x += deltaX;
+        y += deltaY;
+    }
     if (out_of_bounds(x, y) || boardref[x][y] == 0) return false;
     if (iter == 1 && boardref[x][y] == player) return false;
     if (boardref[x][y] == player) return true;
-    bool res = flipDIR(x + deltaX, y + deltaY, deltaX, deltaY, player, record, iter + 1);
+    bool res = flipDIR(x + deltaX, y + deltaY, deltaX, deltaY, record, iter + 1);
 
     if (res) {
         boardref[x][y] = player;
@@ -133,11 +146,9 @@ bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, int player, 
 
 bool BoardController::gppDIR(int x, int y, int deltaX, int deltaY) {
     int iter = 1;
-    int tempx = x;
-    int tempy = y;
-    while(!out_of_bounds(tempx + iter*deltaX, tempy + iter*deltaY)) {
-        tempx = tempx + iter*deltaX;
-        tempy = tempx + iter* deltaY;
+    while(!out_of_bounds(x + iter*deltaX, y + iter*deltaY)) {
+        int tempx = x + iter*deltaX;
+        int tempy = y + iter* deltaY;
         if (iter == 1 && boardref[tempx][tempy] == player) return false;
         else if(boardref[tempx][tempy] == 0) return false;
         else if(boardref[tempx][tempy] == player) return true;

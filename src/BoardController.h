@@ -25,7 +25,7 @@ public:
 
 
 private:
-    void flip(int x, int y, int player, bool record, vector<Piece>* flip_ref);
-    bool flipDIR(int x, int y, int deltaX, int deltaY, int player, bool record, int iter);
+    void flip(int x, int y, bool record, vector<Piece>* flip_ref);
+    bool flipDIR(int x, int y, int deltaX, int deltaY, bool record, int iter);
     bool gppDIR(int x, int y, int deltaX, int deltaY);
 };
