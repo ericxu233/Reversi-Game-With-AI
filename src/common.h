@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <unistd.h>
+#include <climits>
 #include "olcPGE/olcPixelGameEngine.h"
 
 
