@@ -1,3 +1,4 @@
 *.exe
-src/*.exe
+src/game.exe
 .vscode/
+build/

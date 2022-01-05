@@ -141,7 +141,7 @@ void EricReversi::add_piece(int x, int y) {
 void EricReversi::ai_start() {
     int** boardcpy = new int*[SIZE];
     for (int i = 0; i < SIZE; i++) {
-        board[i] = new int[SIZE];
+        boardcpy[i] = new int[SIZE];
     }
 
     for (int i = 0; i < SIZE; i++) {
