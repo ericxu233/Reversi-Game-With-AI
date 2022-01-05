@@ -10,18 +10,24 @@ private:
     int** boardref;
     vector<Piece>* flipped_content;
     int num_pieces;
+    list<bool> skip;
+    
 
 public:
     vector<Piece> playable;
+    list<Piece> lastmove;
+    list<Score> scores;
 
 public:
     BoardController();
     BoardController(bool ai, int** target);
 
-    bool player_update(int x, int y);
+    int player_update(int x, int y, vector<Piece>* ref);
     void get_playable_pos();
     int get_winner();
     int get_player();
+    void revert_move(vector<Piece>* ref);
+    bool skipped();
 
 
 private:

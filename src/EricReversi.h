@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "BoardController.h"
+#include "AI.h"
 
 class EricReversi : public olc::PixelGameEngine {
 public:
@@ -16,6 +17,7 @@ private:
     //testing only
     vector<int> pieceX;
     vector<int> pieceY; 
+    int AI;
 
     //board specs
     int padding;
@@ -43,9 +45,12 @@ private:
     void draw_board();
     void draw_piece(int x, int y, int player);
     void draw_winner();
-    void draw_turn();
+    void draw_turn();                                                                                                                                                                          
 
     //testing only
     void add_piece(int x, int y);
+
+    //test ai
+    void ai_start();
 };
 
