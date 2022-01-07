@@ -27,7 +27,7 @@ ReversiAi::ReversiAi(int** target, int AIplayer, BoardController* refcpy) {
 
 int ReversiAi::determine_move(Piece move) {
     vector<Piece> revert;
-    int ret1 = con.player_update(move.x, move.y, &revert);
+    int ret1 = con.player_update(move.x, move.y);
     
     /*
     for (int i = 0; i < SIZE; i++) {
@@ -44,9 +44,9 @@ int ReversiAi::determine_move(Piece move) {
     int a = INT_MIN;
     int b = INT_MAX;
     //sleep(1);
-    int ret = minmax(64, a, b, false);
+    int ret = minmax(60, a, b, false);
     //artist<< "Reach here..." << endl;
-    con.revert_move(&revert);
+    con.revert_move();
     //artist<< "Reach here..." << endl;
 
     /*
@@ -80,12 +80,17 @@ int ReversiAi::minmax(int depth, int& alpha, int& beta, bool maximize) {
         int maxEval = INT_MIN;
         vector<Piece>* cpyPlayable = con.get_playable();
         for (int i = 0; i < cpyPlayable->size(); i++) {
-            vector<Piece> revert;
-            revert.reserve(16);
-            int ret = con.player_update((*cpyPlayable)[i].x, (*cpyPlayable)[i].y, &revert);
+            int ret = con.player_update((*cpyPlayable)[i].x, (*cpyPlayable)[i].y);
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    cout << boardref[i][j];
+                }
+            cout << endl;
+            }
+            cout << endl;
             //artistitic2<< "update2 " << debug++  << " depth is " << depth << " return code is " << ret << " loop size is " << cpyPlayable->size() << endl; 
             int eval = minmax(depth - 1, alpha, beta, false);
-            con.revert_move(&revert);
+            con.revert_move();
             //artistitic2<< "depth is " << depth << endl;
             maxEval = max(maxEval, eval);
             alpha = max(alpha, eval);
@@ -97,12 +102,17 @@ int ReversiAi::minmax(int depth, int& alpha, int& beta, bool maximize) {
         int minEval = INT_MAX;
         vector<Piece>* cpyPlayable = con.get_playable();
         for (int i = 0; i < cpyPlayable->size(); i++) {
-            vector<Piece> revert;
-            revert.reserve(16);
-            int ret = con.player_update((*cpyPlayable)[i].x, (*cpyPlayable)[i].y, &revert);
+            int ret = con.player_update((*cpyPlayable)[i].x, (*cpyPlayable)[i].y);
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    cout << boardref[i][j];
+                }
+            cout << endl;
+            }
+            cout << endl;
             //artistitic2<< "update3 " << debug++  << " depth is " << depth << " return code is " << ret << " loop size is " << cpyPlayable->size() << endl; 
             int eval = minmax(depth - 1, alpha, beta, true);
-            con.revert_move(&revert);
+            con.revert_move();
             //artistitic2<< "depth is " << depth << endl;
             beta = min(beta, eval);
             if (beta <= alpha) break;

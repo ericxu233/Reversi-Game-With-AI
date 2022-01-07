@@ -17,18 +17,16 @@ BoardController::BoardController() {
     player = 1;
     end = false;
     winner = 0;
-    flipped_content = NULL;
     num_pieces = 4;
 }
 
 BoardController::BoardController(bool ai1, int** target) {
     boardref = target;
 
-    ai = false;
+    ai = ai1;
     player = 1;
     end = false;
     winner = 0;
-    flipped_content = NULL;
     num_pieces = 4;
 }
 
@@ -40,13 +38,12 @@ BoardController::BoardController(BoardController* refcpy, int** target) {
     player = refcpy->player;
     end = refcpy->end;
     winner = refcpy->winner;
-    flipped_content = NULL;
     num_pieces = refcpy->num_pieces;
 
     scores.push_back(refcpy->scores.back());
 }
 
-int BoardController::player_update(int x, int y, vector<Piece>* ref) {
+int BoardController::player_update(int x, int y) {
     bool match = false;
     vector<Piece>* playabback = playab.back();
     for (int i = 0; i < playabback->size(); i++) {
@@ -56,8 +53,8 @@ int BoardController::player_update(int x, int y, vector<Piece>* ref) {
     if (end) return 0;
     boardref[x][y] = player;
     lastmove.push_back({x, y});
-    if (ai) flip(x, y, true, ref);
-    else flip(x, y, false, ref);
+    if (ai) flip(x, y, true);
+    else flip(x, y, false);
     player = (!(player - 1)) + 1;
     num_pieces++;
 
@@ -137,7 +134,7 @@ int BoardController::get_playable_pos() {
     return 1;
 }
 
-void BoardController::revert_move(vector<Piece>* ref) {
+void BoardController::revert_move() {
     int col = player;
     if (skip.back()) {
         col = (!(player - 1)) + 1;
@@ -150,6 +147,12 @@ void BoardController::revert_move(vector<Piece>* ref) {
         playab.pop_back();
     }
 
+    vector<Piece>* ref = flipped_content.back();
+
+    //cout << ref->size() << endl;
+    //cout << end << endl;
+    //cout << endl;
+
     for (int i = 0; i < ref->size(); i++) {
         boardref[(*ref)[i].x][(*ref)[i].y] = col;
     }
@@ -160,8 +163,9 @@ void BoardController::revert_move(vector<Piece>* ref) {
     lastmove.pop_back();
     skip.pop_back();
     scores.pop_back();
+    flipped_content.pop_back();
     if (end) end = false;
-    if (winner != 0) winner = 0;;
+    if (winner != 0) winner = 0;
 }
 
 bool BoardController::skipped() {
@@ -174,6 +178,7 @@ vector<Piece>* BoardController::get_playable() {
 }
 
 void BoardController::update_score() {
+    cout << "note: deprecated do not use..." << endl;
     int score[3];
     score[0] = 0;
     score[1] = 0;
@@ -187,27 +192,35 @@ void BoardController::update_score() {
     scores.push_back(Score(score[1], score[2]));
 }
 
-void BoardController::flip(int x, int y, bool record, vector<Piece>* flip_ref = NULL) {
-    flipped_content = flip_ref;
+bool BoardController::progress() {
+    return flipped_content.size() > 0;
+}
+
+void BoardController::flip(int x, int y, bool record) {
+    //flipped_content = flip_ref;
+
+    vector<Piece>* flipped = new vector<Piece>();
+    flipped->reserve(20);
 
     if (scores.empty()) scores.push_back(Score());
     else scores.push_back(Score(scores.back()));
 
     scores.back().add_score(player);
 
-    flipDIR(x, y, 1, 1, record, 1);
-    flipDIR(x, y, 1, 0, record, 1);
-    flipDIR(x, y, 1, -1, record, 1);
-    flipDIR(x, y, 0, 1, record, 1);
-    flipDIR(x, y, 0, -1, record, 1);
-    flipDIR(x, y, -1, 1, record, 1);
-    flipDIR(x, y, -1, 0, record, 1);
-    flipDIR(x, y, -1, -1, record, 1);
+    flipDIR(x, y, 1, 1, record, 1, flipped);
+    flipDIR(x, y, 1, 0, record, 1, flipped);
+    flipDIR(x, y, 1, -1, record, 1, flipped);
+    flipDIR(x, y, 0, 1, record, 1, flipped);
+    flipDIR(x, y, 0, -1, record, 1, flipped);
+    flipDIR(x, y, -1, 1, record, 1, flipped);
+    flipDIR(x, y, -1, 0, record, 1, flipped);
+    flipDIR(x, y, -1, -1, record, 1, flipped);
 
-    flipped_content = NULL;
+    flipped_content.push_back(flipped);
+    //flipped_content = NULL;
 }
 
-bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, bool record, int iter) {
+bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, bool record, int iter, vector<Piece>* flip_ref) {
     if (iter == 1) {
         x += deltaX;
         y += deltaY;
@@ -215,12 +228,12 @@ bool BoardController::flipDIR(int x, int y, int deltaX, int deltaY, bool record,
     if (out_of_bounds(x, y) || boardref[x][y] == 0) return false;
     if (iter == 1 && boardref[x][y] == player) return false;
     if (boardref[x][y] == player) return true;
-    bool res = flipDIR(x + deltaX, y + deltaY, deltaX, deltaY, record, iter + 1);
+    bool res = flipDIR(x + deltaX, y + deltaY, deltaX, deltaY, record, iter + 1, flip_ref);
 
     if (res) {
         boardref[x][y] = player;
         scores.back().add_score(player);
-        if (record && flipped_content != NULL) flipped_content->push_back({x, y});
+        if (record) flip_ref->push_back({x, y});
     }
 
     return res;

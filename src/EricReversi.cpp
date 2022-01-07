@@ -20,14 +20,14 @@ bool EricReversi::OnUserCreate()
         }
     }
     
-    AI = 2;
+    AI = 0;
 
     board[3][3] = 2;
     board[4][3] = 1;
     board[4][4] = 2;
     board[3][4] = 1;
 
-    b_con = new BoardController(false, board);
+    b_con = new BoardController(true, board);
 
     b_con->get_playable_pos();
 
@@ -106,7 +106,20 @@ void EricReversi::move() {
         int px = (mx - bstartX)/stride;
         int py = (my - bstartY)/stride;
 
-        b_con->player_update(px, py, NULL);
+        b_con->player_update(px, py);
+    }
+
+    auto click2 = GetMouse(2);
+    if (IsFocused() && click2.bPressed && b_con->progress()) {
+        int mx = GetMouseX();
+        int my = GetMouseY();
+
+        if (mx < bstartX || mx > bendX || my < bstartY || my > bendY) return;
+
+        int px = (mx - bstartX)/stride;
+        int py = (my - bstartY)/stride;
+
+        b_con->revert_move();
     }
 }
 
@@ -191,5 +204,5 @@ void EricReversi::ai_start() {
     cout << endl;
     */
 
-    b_con->player_update(mm.x, mm.y, NULL);
+    b_con->player_update(mm.x, mm.y);
 }
