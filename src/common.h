@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <climits>
 #include "olcPGE/olcPixelGameEngine.h"
+#include <thread>
+#include <mutex>
 
 
 #define SIZE 8
@@ -10,7 +12,6 @@
 using namespace std;
 
 extern int** board;
-
 
 struct Piece {
     int x;
@@ -30,6 +31,11 @@ public:
         score[0] = cpy.score[0];
         score[1] = cpy.score[1];
     } 
+
+    Score(int x, int y) {
+        score[0] = x;
+        score[1] = y;
+    }
 
     void add_score(int player) {
         int index = player - 1;

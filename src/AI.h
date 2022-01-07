@@ -5,7 +5,7 @@ class ReversiAi {
 public:
     ReversiAi();
     ReversiAi(int** target, Piece move, int AIplayer);
-    ReversiAi(int** target, int AIplayer);
+    ReversiAi(int** target, int AIplayer, BoardController* refcpy);
 
 private:
     int** boardref;

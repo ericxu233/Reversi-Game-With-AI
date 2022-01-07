@@ -17,8 +17,6 @@ BoardController::BoardController() {
     player = 1;
     end = false;
     winner = 0;
-    playable = vector<Piece>();
-    playable.reserve(16);
     flipped_content = NULL;
     num_pieces = 4;
 }
@@ -30,20 +28,32 @@ BoardController::BoardController(bool ai1, int** target) {
     player = 1;
     end = false;
     winner = 0;
-    playable = vector<Piece>();
-    playable.reserve(16);
     flipped_content = NULL;
     num_pieces = 4;
 }
 
+BoardController::BoardController(BoardController* refcpy, int** target) {
+    boardref = target;
+
+    ai = refcpy->ai;
+    ai = true;
+    player = refcpy->player;
+    end = refcpy->end;
+    winner = refcpy->winner;
+    flipped_content = NULL;
+    num_pieces = refcpy->num_pieces;
+
+    scores.push_back(refcpy->scores.back());
+}
+
 int BoardController::player_update(int x, int y, vector<Piece>* ref) {
     bool match = false;
-    for (int i = 0; i < playable.size(); i++) {
-        if (x == playable[i].x && y == playable[i].y) match = true;
+    vector<Piece>* playabback = playab.back();
+    for (int i = 0; i < playabback->size(); i++) {
+        if (x == (*playabback)[i].x && y == (*playabback)[i].y) match = true;
     }
     if (!match) return -1;
     if (end) return 0;
-    playable.clear();
     boardref[x][y] = player;
     lastmove.push_back({x, y});
     if (ai) flip(x, y, true, ref);
@@ -52,24 +62,30 @@ int BoardController::player_update(int x, int y, vector<Piece>* ref) {
     num_pieces++;
 
     if (num_pieces == SIZE*SIZE) end = true;
-    if (end) return 0;
-
-    //cout << "Reaches HEre" << endl;
-
-    get_playable_pos();
-
-    if (playable.empty()) {
-        player = (!(player - 1)) + 1;
+    if (end) {
         get_playable_pos();
+        skip.push_back(false);
+        return 0;
+    }
+
+    //artist<< "Reaches HEre" << endl;
+
+    int ret = get_playable_pos();
+
+    if (ret == 0) {
+        player = (!(player - 1)) + 1;
+        int ret = get_playable_pos();
         skip.push_back(true);
-        if (playable.empty()) {
-            //cout << "Reaches HEre Uh Oh" << endl;
+        if (ret == 0) {
+            //artist<< "Reaches HEre Uh Oh" << endl;
             end = true;
             return 0;
         }
+        //artistitic2<< "lastmove: " << lastmove.size() << " skip: " << skip.size() << " scores: " << scores.size() << endl;
         return 2;
     }
     skip.push_back(false);
+    //artistitic2<< "lastmove: " << lastmove.size() << " skip: " << skip.size() << " scores: " << scores.size() << endl;
     return 1;
 }
 
@@ -97,8 +113,9 @@ int BoardController::get_player() {
     return player;
 }
 
-void BoardController::get_playable_pos() {
-    playable.clear();
+int BoardController::get_playable_pos() {
+    vector<Piece>* tts = new vector<Piece>();
+    tts->reserve(16);
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (board[i][j] != 0) continue;
@@ -111,31 +128,63 @@ void BoardController::get_playable_pos() {
                             gppDIR(i, j, -1, 0) ||
                             gppDIR(i, j, -1, -1);
             if (playable_ind) {
-                playable.push_back({i, j});
+                tts->push_back({i, j});
             }
         }
     }
+    playab.push_back(tts);
+    if (tts->empty()) return 0;
+    return 1;
 }
 
 void BoardController::revert_move(vector<Piece>* ref) {
     int col = player;
-    if (skip.back()) col = player = (!(player - 1)) + 1;
+    if (skip.back()) {
+        col = (!(player - 1)) + 1;
+        playab.pop_back();
+        playab.pop_back();
+    }
+    else {
+        col = player;
+        player = (!(player - 1)) + 1;
+        playab.pop_back();
+    }
 
     for (int i = 0; i < ref->size(); i++) {
         boardref[(*ref)[i].x][(*ref)[i].y] = col;
     }
+    //artistitic2<< " yolo hhhhhhhh lastmove: " << lastmove.size() << " skip: " << skip.size() << " scores: " << scores.size() << endl;
     boardref[lastmove.back().x][lastmove.back().y] = 0;
+    num_pieces--;
 
     lastmove.pop_back();
     skip.pop_back();
     scores.pop_back();
     if (end) end = false;
-    if (winner != 0) winner = 0;
+    if (winner != 0) winner = 0;;
 }
 
 bool BoardController::skipped() {
     if (skip.empty()) return false;
     return skip.back();
+}
+
+vector<Piece>* BoardController::get_playable() {
+    return playab.back();
+}
+
+void BoardController::update_score() {
+    int score[3];
+    score[0] = 0;
+    score[1] = 0;
+    score[2] = 0;
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            score[boardref[i][j]] += 1;
+        }
+    }
+    scores.push_back(Score(score[1], score[2]));
 }
 
 void BoardController::flip(int x, int y, bool record, vector<Piece>* flip_ref = NULL) {

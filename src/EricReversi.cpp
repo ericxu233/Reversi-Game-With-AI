@@ -1,12 +1,13 @@
 #include "EricReversi.h"
 
+
 bool EricReversi::OnUserCreate()
 {
     // Called once at the start, so create things here
     height = ScreenHeight();
     width = ScreenWidth();
     board_dim_init();
-    cout << height << " " << width << endl;
+    //artistitic2<< height << " " << width << endl;
 
     board = new int*[SIZE];
     for (int i = 0; i < SIZE; i++) {
@@ -30,7 +31,7 @@ bool EricReversi::OnUserCreate()
 
     b_con->get_playable_pos();
 
-    //cout << "Reach Here?" << endl;
+    //artist<< "Reach Here?" << endl;
 
 	return true;
 }
@@ -54,8 +55,9 @@ bool EricReversi::OnUserUpdate(float fElapsedTime)
         }
     }
     
-    for (int i = 0; i < b_con->playable.size(); i++) {
-        FillCircle(midX[b_con->playable[i].x], midY[b_con->playable[i].y], slen*0.1, olc::RED);
+    vector<Piece>* temp = b_con->get_playable();
+    for (int i = 0; i < temp->size(); i++) {
+        FillCircle(midX[(*temp)[i].x], midY[(*temp)[i].y], slen*0.1, olc::RED);
     }
 
     if (!b_con->lastmove.empty()) FillCircle(midX[b_con->lastmove.back().x], midY[b_con->lastmove.back().y], slen*0.15, olc::Pixel(212, 69, 237));
@@ -150,14 +152,27 @@ void EricReversi::ai_start() {
         }
     }
 
+    /*
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            cout << boardcpy[i][j];
+        }
+        cout << endl;
+    }
+    cout << endl;
+    */
+    
 
-    ReversiAi ai(boardcpy, AI);
+
+    ReversiAi ai(boardcpy, AI, b_con);
 
     int maxscore = INT_MIN;
     Piece mm;
 
-    for (int i = 0; i < b_con->playable.size(); i++) {
-        Piece temp = b_con->playable[i];
+    vector<Piece>* playable = b_con->get_playable(); 
+
+    for (int i = 0; i < playable->size(); i++) {
+        Piece temp = (*playable)[i];
         boardcpy[temp.x][temp.y] = AI;
         int tempscore = ai.determine_move(temp);
         if (maxscore < tempscore) {
@@ -165,6 +180,16 @@ void EricReversi::ai_start() {
             mm = temp;
         }
     }
+
+    /*
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            cout << boardcpy[i][j];
+        }
+        cout << endl;
+    }
+    cout << endl;
+    */
 
     b_con->player_update(mm.x, mm.y, NULL);
 }
